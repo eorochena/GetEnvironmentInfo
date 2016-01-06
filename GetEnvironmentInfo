@@ -1,0 +1,273 @@
+#!/usr/bin/python
+
+import elementtree.ElementTree as ET
+import subprocess, paramiko, getpass, sys, time, os, Queue, threading
+
+Address = raw_input('Enter IP > ')
+xxx =  getpass.getpass()
+user = 'root'
+xml_local = '/media/BigDrive/scratch_dir/environment.xml'
+xml_remote = '/etc/HPCCSystems/environment.xml'
+release_local = '/media/BigDrive/scratch_Dir/redhat-release'
+release_remote = '/etc/redhat-release'
+
+class XML():
+	def __init__(self):
+		self.xml = self
+
+	def getXML(self):
+		host = paramiko.Transport((Address, 22))
+		host.connect(username = user, password = xxx)
+		sftp = paramiko.SFTPClient.from_transport(host)
+		sftp.get(xml_remote, xml_local)
+
+class XMLParser():
+	
+	def __init__(self):
+		self.parsing = self
+
+	def IPs(self):
+		ParseXML = ET.parse(xml_local)
+		doc_root = ParseXML.getroot()
+		ip_addresses = []
+		for i in doc_root.findall('.//DafilesrvProcess/Instance'):
+			ip = i.attrib['netAddress']
+			ip_addresses.append(ip)
+		for i in ip_addresses:
+			print i
+		return "[===============]"
+		
+	def IP_Addr(self):
+		ParseXML = ET.parse(xml_local)
+		doc_root = ParseXML.getroot()
+		ip_addresses = []
+		for i in doc_root.findall('.//DafilesrvProcess/Instance'):
+			ip = i.attrib['netAddress']
+			ip_addresses.append(ip)
+		return ip_addresses
+
+
+	def NumberOfServers(self):
+		ParseXML = ET.parse(xml_local)
+		doc_root = ParseXML.getroot()
+		ip_addresses = []
+		for i in doc_root.findall('.//DafilesrvProcess/Instance'):
+			ip = i.attrib['netAddress']
+			ip_addresses.append(ip)
+		return ip_addresses
+	
+	def dali(self):
+		ParseXML = ET.parse(xml_local)
+		doc_root = ParseXML.getroot()
+		for i in doc_root.findall('.//DaliServerProcess/Instance'):
+			DaliIP = i.attrib['netAddress']
+		return DaliIP
+	
+	def eclccservers(self):
+		ParseXML = ET.parse(xml_local)
+		doc_root = ParseXML.getroot()
+		eclservers = []
+		for i in doc_root.findall('.//EclCCServerProcess/Instance'):
+			ECLIP = i.attrib['netAddress']
+			eclservers.append(ECLIP)
+		return eclservers
+
+	def eclservers(self):
+		ParseXML = ET.parse(xml_local)
+		doc_root = ParseXML.getroot()
+		eclservers = []
+		for i in doc_root.findall('.//EclServerProcess/Instance'):
+			ECLIP = i.attrib['netAddress']
+			eclservers.append(ECLIP)
+		return eclservers
+
+	def eclagent(self):
+		ParseXML = ET.parse(xml_local)
+		doc_root = ParseXML.getroot()
+		agents = []
+		for i in doc_root.findall('.//EclAgentProcess/Instance'):
+			AgentIP = i.attrib['netAddress']
+			agents.append(AgentIP)
+		return agents
+
+	def dfuserver(self):
+		ParseXML = ET.parse(xml_local)
+		doc_root = ParseXML.getroot()
+		dfuserver = []
+		for i in doc_root.findall('.//DfuServerProcess/Instance'):
+			DfuServer = i.attrib['netAddress']
+			dfuserver.append(DfuServer)
+		return dfuserver
+	
+	def ESP(self):
+		ParseXML = ET.parse(xml_local)
+		doc_root = ParseXML.getroot()
+		ESP = []
+		for i in doc_root.findall('.//EspProcess/Instance'):
+			EspServer = i.attrib['netAddress']
+			ESP.append(EspServer)
+		return ESP
+
+
+	def EclScheduler(self):
+		ParseXML = ET.parse(xml_local)
+		doc_root = ParseXML.getroot()
+		eclscheduler = []
+		for i in doc_root.findall('.//EclSchedulerProcess/Instance'):
+			scheduler = i.attrib['netAddress']
+			eclscheduler.append(scheduler)
+		return eclscheduler
+
+
+	def sasha(self):
+		ParseXML = ET.parse(xml_local)
+		doc_root = ParseXML.getroot()
+		for i in doc_root.findall('.//SashaServerProcess/Instance'):
+			Sasha = i.attrib['netAddress']
+		return Sasha
+
+	def ThorMaster(self):
+		ParseXML = ET.parse(xml_local)
+		doc_root = ParseXML.getroot()
+		Thors = []
+		for i in doc_root.findall('.//ThorMasterProcess'):
+			Thor = i.attrib['computer']
+			Thors.append(Thor)
+		d = {}
+		for i in doc_root.findall('.//Hardware/Computer'):
+			Machine = i.attrib['name']
+			IP = i.attrib['netAddress']
+			d[Machine] = IP
+		ThorMasters = []
+		for i in d:
+			if i not in Thors:
+				continue
+			elif i in Thors:
+				ThorMasters.append(d[i])
+		return ThorMasters
+			
+
+class Details():
+	
+	pars = XMLParser()
+
+	def __init__(self):
+		self.details = self
+
+	def GetUptime(self):
+		for i in pars.IP_Addr():
+			cmd = 'uptime'
+			con = paramiko.SSHClient()
+			con.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+			con.connect(i, username = user, password = xxx)
+			stdin, stdout, stderr = con.exec_command(cmd)
+			print i,'    ', stdout.read()
+		return '=============================================='
+
+	def GetRPMVersion(self):
+		for i in pars.IP_Addr():
+			cmd = 'rpm -qa|grep hpcc'
+			con = paramiko.SSHClient()
+			con.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+			con.connect(i, username = user, password = xxx)
+			stdin, stdout, stderr = con.exec_command(cmd)
+			result = i+'   '+stdout.read()
+			print result
+		return '======================================='
+
+	def GetCheckSum(self):
+		for i in pars.IP_Addr():
+			cmd = 'md5sum /etc/HPCCSystems/environment.xml'
+			con = paramiko.SSHClient()
+			con.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+			con.connect(i, username = user, password = xxx)
+			stdin, stdout, stderr = con.exec_command(cmd)
+			result = i+'   '+stdout.read()
+			print result
+		return '======================================='
+
+	def GetCentOSVersion(self):
+		for i in pars.IP_Addr():
+			cmd = 'cat /etc/redhat-release'
+			con = paramiko.SSHClient()
+			con.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+			con.connect(i, username = user, password = xxx)
+			stdin, stdout, stderr = con.exec_command(cmd)
+			print i,'    ', stdout.read()
+		return '========================================'
+
+class CCleaner():
+	
+	def __init__(self):
+		self.clean = clean
+
+	def clean_scratch(self):
+		removeXML = ['rm -f %s' % xml_local]
+		removeRelease = [ 'rm -f %s' % release_local]
+		subprocess.call(removeXML[0], shell = True)
+		subprocess.call(removeRelease[0], shell = True)
+
+	def clean_remote(self, i):
+		removeRPM = ['rm -f %s' % hpcc_package]
+		ssh = paramiko.SSHClient()
+		ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+		ssh.connect(i, username = user, password = xxx)
+		stdin, stdout, stderr = ssh.exec_command(removeRPM[0])
+		print 'Cleaning up ', i
+
+class menu():
+
+	def __init__(self):
+		self.menu = menu
+
+	def menu(self):
+		print
+		print '======================================='
+		print '=                                     ='
+		print '= Choose 1 for uptime                 ='
+		print
+
+a = XML()
+a.getXML()
+pars = XMLParser()
+detail = Details()
+print
+#print '=== list of IP Addresses ===\n', pars.IPs()
+print
+print 'Number of servers = ', len(pars.NumberOfServers())
+print
+print '=========================== Main Components ======================='
+print
+print 'dali = ', pars.dali()
+print
+print 'sasha = ', pars.sasha()
+print
+print 'eclagent =', pars.eclagent()
+print 'Number of ECLAgents = ', len(pars.eclagent())
+print
+print 'eclccserver = ', pars.eclccservers()
+print 'Number of eclccservers = ', len(pars.eclccservers())
+print
+print 'eclserver = ', pars.eclservers()
+print 'Number of eclservers =', len(pars.eclservers())
+print
+print 'dfuserver = ', pars.dfuserver()
+print 'Number of DFUServers = ', len(pars.dfuserver())
+print
+print 'eclscheduler = ', pars.EclScheduler()
+print 'Number of schedulers = ', len(pars.EclScheduler())
+print
+print 'esp = ', pars.ESP()
+print 'Number of ESP Servers = ', len(pars.ESP())
+print
+print 'ThorMaster = ', pars.ThorMaster()
+print 'Number of Clusters = ', len(pars.ThorMaster())
+print
+print '======================================================================'
+print
+#print '\nCheckSum\n', detail.GetCheckSum()
+#print '== Build == ','\n', detail.GetRPMVersion()
+print 
+#print '== CentOS Version ==','\n', detail.GetCentOSVersion()
+print
+#print '== Uptime ==','\n',detail.GetUptime()
