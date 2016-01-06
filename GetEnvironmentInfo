@@ -1,15 +1,19 @@
 #!/usr/bin/python
 
-import elementtree.ElementTree as ET
+import xml.etree.ElementTree as ET
 import subprocess, paramiko, getpass, sys, time, os, Queue, threading
 
 Address = raw_input('Enter IP > ')
 xxx =  getpass.getpass()
 user = 'root'
-xml_local = '/media/BigDrive/scratch_dir/environment.xml'
+local_dir = '/tmp'
+xml_local = '/tmp/environment.xml'
 xml_remote = '/etc/HPCCSystems/environment.xml'
-release_local = '/media/BigDrive/scratch_Dir/redhat-release'
+release_local = '/tmp/redhat-release'
 release_remote = '/etc/redhat-release'
+
+if not os.path.isdir(local_dir):
+	subprocess.call(('mkdir %s') % local_dir, shell=True)
 
 class XML():
 	def __init__(self):
