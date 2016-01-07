@@ -235,43 +235,42 @@ a = XML()
 a.getXML()
 pars = XMLParser()
 detail = Details()
-print
-#print '=== list of IP Addresses ===\n', pars.IPs()
-print
-print 'Number of servers = ', len(pars.NumberOfServers())
-print
-print '=========================== Main Components ======================='
-print
-print 'dali = ', pars.dali()
-print
-print 'sasha = ', pars.sasha()
-print
-print 'eclagent =', pars.eclagent()
-print 'Number of ECLAgents = ', len(pars.eclagent())
-print
-print 'eclccserver = ', pars.eclccservers()
-print 'Number of eclccservers = ', len(pars.eclccservers())
-print
-print 'eclserver = ', pars.eclservers()
-print 'Number of eclservers =', len(pars.eclservers())
-print
-print 'dfuserver = ', pars.dfuserver()
-print 'Number of DFUServers = ', len(pars.dfuserver())
-print
-print 'eclscheduler = ', pars.EclScheduler()
-print 'Number of schedulers = ', len(pars.EclScheduler())
-print
-print 'esp = ', pars.ESP()
-print 'Number of ESP Servers = ', len(pars.ESP())
-print
-print 'ThorMaster = ', pars.ThorMaster()
-print 'Number of Clusters = ', len(pars.ThorMaster())
-print
-print '======================================================================'
-print
+print """
+Number of servers =  %s
+
+=========================== Main Components =======================
+
+dali = %s
+
+sasha = %s
+
+eclagent = %s
+Number of ECLAgents = %s
+
+eclccserver = %s
+'Number of eclccservers = ', %s
+
+eclserver = %s
+Number of eclservers = %s
+
+dfuserver = %s
+Number of DFUServers = %s
+
+eclscheduler = %s
+Number of schedulers = %s
+
+esp = %s
+Number of ESP Servers = %s
+
+ThorMaster = %s
+Number of Clusters = %s
+
+======================================================================
+""" % (len(pars.NumberOfServers()), pars.dali(), pars.sasha(), pars.eclagent(), len(pars.eclagent()), pars.eclccservers(), len(pars.eclccservers()), pars.eclservers(), len(pars.eclservers()), pars.dfuserver(), len(pars.dfuserver()), pars.EclScheduler(), len(pars.EclScheduler()), pars.ESP(), len(pars.ESP()), pars.ThorMaster(), len(pars.ThorMaster()))
+
 #print '\nCheckSum\n', detail.GetCheckSum()
 #print '== Build == ','\n', detail.GetRPMVersion()
-print 
+#print 
 #print '== CentOS Version ==','\n', detail.GetCentOSVersion()
-print
+#print
 #print '== Uptime ==','\n',detail.GetUptime()
